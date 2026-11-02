@@ -10,3 +10,10 @@ Thumbs.db
 
 # Local scratch
 *.log
+
+# Backend runtime scratch
+backend/work/
+
+# Python venvs
+.venv/
+venv/
