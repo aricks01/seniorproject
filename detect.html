@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Detect — StegApp</title>
+<link rel="stylesheet" href="style.css">
+</head><body>
+<header class="topbar">
+  <a class="brand" href="index.html">Steg<span>App</span></a>
+  <nav class="ops">
+    <a href="embed.html">Embed</a>
+    <a href="extract.html">Extract</a>
+    <a href="detect.html">Detect</a>
+    <a href="crack.html">Crack</a>
+  </nav>
+  <label class="apikey">API key
+    <input type="password" id="apikey" autocomplete="off" placeholder="X-API-Key">
+  </label>
+</header>
+<main>
+<section class="panel">
+  <h2>Detect</h2>
+  <p class="lede">Scan a file for statistical signs of embedded content. This does not
+     recover the payload — it only reports whether something is likely hidden.</p>
+  <form data-endpoint="/api/detect" data-mode="job">
+    <label>File to scan
+      <input type="file" name="stego" required>
+    </label>
+    <div class="actions">
+      <button class="btn">Detect</button>
+      <button type="button" class="btn ghost" data-cancel hidden>Cancel</button>
+    </div>
+    <div class="bar"><i></i></div>
+    <p class="out" role="status"></p>
+  </form>
+</section>
+</main>
+<script src="common.js"></script>
+</body></html>

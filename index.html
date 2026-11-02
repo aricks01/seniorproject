@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>StegApp — Image Steganography</title>
+<link rel="stylesheet" href="style.css">
+</head><body>
+<header class="topbar">
+  <a class="brand" href="index.html">Steg<span>App</span></a>
+  <nav class="ops">
+    <a href="embed.html">Embed</a>
+    <a href="extract.html">Extract</a>
+    <a href="detect.html">Detect</a>
+    <a href="crack.html">Crack</a>
+  </nav>
+  <label class="apikey">API key
+    <input type="password" id="apikey" autocomplete="off" placeholder="X-API-Key">
+  </label>
+</header>
+<main>
+  <section class="hero">
+    <h1>Image Steganography Toolkit</h1>
+    <p>A front end for steganographic operations on image files. Each operation runs
+       server-side against a Kali utility. Pick an operation to begin.</p>
+  </section>
+  <div class="grid">
+    <a class="card" href="embed.html">
+      <h3><span class="ico">📥</span>Embed</h3>
+      <p>Hide a secret file inside a cover image (JPEG/BMP) or audio carrier, optionally with a passphrase.</p>
+    </a>
+    <a class="card" href="extract.html">
+      <h3><span class="ico">📤</span>Extract</h3>
+      <p>Pull a hidden payload back out of a stego file using the passphrase it was embedded with.</p>
+    </a>
+    <a class="card" href="detect.html">
+      <h3><span class="ico">🔎</span>Detect</h3>
+      <p>Scan a file for signs of embedded content without trying to recover it.</p>
+    </a>
+    <a class="card" href="crack.html">
+      <h3><span class="ico">🔑</span>Crack</h3>
+      <p>Run a wordlist against a stego file to recover an unknown passphrase.</p>
+    </a>
+  </div>
+</main>
+<script src="common.js"></script>
+</body></html>

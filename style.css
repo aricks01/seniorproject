@@ -1,0 +1,161 @@
+:root {
+  color-scheme: light dark;
+  --bg: #fbfbfd;
+  --panel: #ffffff;
+  --ink: #1a1a1f;
+  --muted: #5c5c6a;
+  --line: #d9d9e3;
+  --accent: #4f46e5;
+  --accent-ink: #ffffff;
+  --ok: #157f3b;
+  --err: #c0362c;
+  --radius: 12px;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0f0f14;
+    --panel: #1a1a22;
+    --ink: #ececf1;
+    --muted: #9a9aab;
+    --line: #2d2d3a;
+    --accent: #7c74ff;
+    --accent-ink: #0f0f14;
+  }
+}
+* { box-sizing: border-box; }
+body {
+  font-family: system-ui, -apple-system, Segoe UI, sans-serif;
+  color: var(--ink);
+  background: var(--bg);
+  margin: 0;
+  line-height: 1.5;
+}
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding: .75rem 1.25rem;
+  border-bottom: 1px solid var(--line);
+  background: var(--panel);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+.brand {
+  font-weight: 700;
+  font-size: 1.1rem;
+  letter-spacing: -0.01em;
+  text-decoration: none;
+  color: var(--ink);
+  margin-right: .5rem;
+}
+.brand span { color: var(--accent); }
+nav.ops { display: flex; gap: .25rem; flex-wrap: wrap; }
+nav.ops a {
+  text-decoration: none;
+  color: var(--muted);
+  padding: .35rem .7rem;
+  border-radius: 8px;
+  font-size: .92rem;
+}
+nav.ops a:hover { background: var(--line); color: var(--ink); }
+nav.ops a.active { background: var(--accent); color: var(--accent-ink); }
+.apikey {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+  font-size: .85rem;
+  color: var(--muted);
+}
+.apikey input {
+  width: 11rem;
+  padding: .35rem .5rem;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--ink);
+}
+main {
+  max-width: 44rem;
+  margin: 0 auto;
+  padding: 1.5rem 1.25rem 4rem;
+}
+.hero h1 { font-size: 1.8rem; margin: .5rem 0; letter-spacing: -0.02em; }
+.hero p { color: var(--muted); max-width: 34rem; }
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+.card {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 1.1rem;
+  transition: border-color .15s, transform .15s;
+}
+.card:hover { border-color: var(--accent); transform: translateY(-2px); }
+.card h3 { margin: 0 0 .3rem; font-size: 1.05rem; }
+.card h3 .ico { margin-right: .4rem; }
+.card p { margin: 0; color: var(--muted); font-size: .9rem; }
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+}
+.panel h2 { margin: 0 0 .25rem; font-size: 1.4rem; letter-spacing: -0.01em; }
+.panel .lede { color: var(--muted); margin: 0 0 1.25rem; font-size: .92rem; }
+label { display: block; margin: .9rem 0; font-size: .92rem; font-weight: 500; }
+label .hint { display: block; font-weight: 400; color: var(--muted); font-size: .82rem; margin-top: .15rem; }
+input[type=file], input[type=password], input[type=text], select {
+  display: block;
+  width: 100%;
+  margin-top: .35rem;
+  padding: .55rem .6rem;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--ink);
+  font: inherit;
+}
+.btn {
+  padding: .6rem 1.2rem;
+  border: none;
+  border-radius: 8px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+.btn:disabled { opacity: .55; cursor: progress; }
+.btn.ghost {
+  background: transparent;
+  color: var(--muted);
+  border: 1px solid var(--line);
+}
+.actions { display: flex; gap: .6rem; align-items: center; margin-top: 1.1rem; }
+.out {
+  margin: 1.1rem 0 0;
+  padding: .75rem .9rem;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: var(--bg);
+  font-size: .92rem;
+  min-height: 1.2rem;
+  word-break: break-word;
+}
+.out:empty { display: none; }
+.out.ok { border-color: var(--ok); color: var(--ok); }
+.out.err { border-color: var(--err); color: var(--err); }
+.out.busy { border-color: var(--accent); }
+.out a { color: var(--accent); }
+.bar { height: 6px; background: var(--line); border-radius: 999px; overflow: hidden; margin-top: .5rem; }
+.bar > i { display: block; height: 100%; width: 0; background: var(--accent); transition: width .3s; }
