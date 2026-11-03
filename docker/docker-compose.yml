@@ -1,0 +1,36 @@
+# StegApp — one-command run on Kali:
+#
+#   cd docker
+#   docker compose up --build
+#
+# Then open http://localhost:8080/
+#
+# Build context is the repo root (..), so the Dockerfile sees backend/ and the
+# frontend files. Override settings below with a docker/.env file if you like.
+
+services:
+  stegapp:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+      args:
+        STEGSEEK_VERSION: "0.6"
+    image: stegapp:latest
+    ports:
+      - "8080:8080"
+    environment:
+      # Unset -> any non-empty X-API-Key is accepted (dev mode). Set a real key
+      # here or in docker/.env to lock down /api/crack.
+      STEGAPP_API_KEY: "${STEGAPP_API_KEY:-}"
+      STEGAPP_WORK_DIR: /data/work
+    volumes:
+      # Persistent scratch (uploads + extracted payloads) off the image layer.
+      - stegapp-data:/data
+      # Kali's system wordlists (rockyou, etc.) read-only. config.py auto-adds
+      # /usr/share/wordlists when it exists. Comment this out on a host that
+      # doesn't have that directory, or the bind mount will fail to start.
+      - /usr/share/wordlists:/usr/share/wordlists:ro
+    restart: unless-stopped
+
+volumes:
+  stegapp-data:

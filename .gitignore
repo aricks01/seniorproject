@@ -17,3 +17,6 @@ backend/work/
 # Python venvs
 .venv/
 venv/
+
+# Docker local env (may contain secrets)
+docker/.env

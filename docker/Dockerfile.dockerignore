@@ -1,0 +1,12 @@
+.git
+.gitignore
+**/__pycache__/
+**/*.pyc
+backend/.venv/
+backend/work/
+*.log
+.DS_Store
+Thumbs.db
+.vscode/
+Dockerfile
+.dockerignore
