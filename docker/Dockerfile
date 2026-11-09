@@ -1,50 +1,25 @@
 # syntax=docker/dockerfile:1
 
 # ---------------------------------------------------------------------------
-# Stage 1: build stegseek from source.
-# Upstream ships no Debian package, so we compile the release tarball. Stegseek
-# vendors its own steghide fork, hence the libmcrypt/libmhash/libjpeg deps.
-# ---------------------------------------------------------------------------
-FROM debian:bookworm-slim AS stegseek-build
-
-ARG STEGSEEK_VERSION=0.6
-
-RUN apt-get update && apt-get install -y --no-install-recommends \
-        build-essential \
-        cmake \
-        ca-certificates \
-        curl \
-        libmcrypt-dev \
-        libmhash-dev \
-        libjpeg-dev \
-        zlib1g-dev \
-    && rm -rf /var/lib/apt/lists/*
-
-WORKDIR /src
-RUN curl -fsSL "https://github.com/RickdeJager/stegseek/archive/refs/tags/v${STEGSEEK_VERSION}.tar.gz" \
-      -o stegseek.tar.gz \
- && tar -xzf stegseek.tar.gz --strip-components=1 \
- && rm stegseek.tar.gz
-
-RUN cmake -DCMAKE_BUILD_TYPE=Release -S . -B build \
- && cmake --build build -j "$(nproc)" \
- && strip build/stegseek \
- && build/stegseek --version
-
-# ---------------------------------------------------------------------------
-# Stage 2: runtime — steghide from apt, stegseek from stage 1, plus the app.
+# Runtime: steghide + stegseek from apt, plus the app.
+#
+# Stegseek ships a prebuilt Debian package on its GitHub releases, so we install
+# that instead of compiling from source. apt resolves its libmcrypt/libmhash/
+# libjpeg dependencies automatically.
 # ---------------------------------------------------------------------------
 FROM python:3.11-slim-bookworm AS runtime
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-        steghide \
-        libmcrypt4 \
-        libmhash2 \
-        libjpeg62-turbo \
-        zlib1g \
-    && rm -rf /var/lib/apt/lists/*
+ARG STEGSEEK_VERSION=0.6
 
-COPY --from=stegseek-build /src/build/stegseek /usr/local/bin/stegseek
+# Fetch the stegseek .deb (ADD needs no curl in the image).
+ADD https://github.com/RickdeJager/stegseek/releases/download/v${STEGSEEK_VERSION}/stegseek_${STEGSEEK_VERSION}-1.deb /tmp/stegseek.deb
+
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends \
+        steghide \
+        /tmp/stegseek.deb \
+ && rm -f /tmp/stegseek.deb \
+ && rm -rf /var/lib/apt/lists/*
 
 # Fail the build rather than the first request if either tool is unusable.
 RUN steghide --version && stegseek --version
