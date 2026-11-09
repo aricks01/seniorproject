@@ -77,13 +77,31 @@ cleanup() {
 trap 'cleanup; exit 0' INT TERM
 trap cleanup EXIT
 
+# Copy text to the clipboard using whatever tool is available. With the VM's
+# shared clipboard enabled, this lands on the Windows host clipboard too.
+copy_clip() {
+  local text="$1"
+  if command -v xclip  >/dev/null 2>&1; then printf '%s' "$text" | xclip -selection clipboard 2>/dev/null && return 0; fi
+  if command -v wl-copy >/dev/null 2>&1; then printf '%s' "$text" | wl-copy             2>/dev/null && return 0; fi
+  if command -v xsel   >/dev/null 2>&1; then printf '%s' "$text" | xsel -ib             2>/dev/null && return 0; fi
+  return 1
+}
+
 banner() {
+  local link="${FRONTEND_URL}/#backend=${PUBLIC_URL}&key=${API_KEY}"
+  # Fallback export: a file you can open via a VM shared folder.
+  printf '%s\n' "$link" > "$HERE/backend-link.txt" 2>/dev/null || true
+  local clipmsg=""
+  copy_clip "$link" && clipmsg="  (also copied to the clipboard — paste on your host)"
+
   echo
   echo "=================================================================="
   echo "  Backend is live. Open this link to auto-configure the frontend"
   echo "  (no typing needed):"
   echo
-  echo "    ${FRONTEND_URL}/#backend=${PUBLIC_URL}&key=${API_KEY}"
+  echo "    $link"
+  echo "$clipmsg"
+  echo "  Saved to: $HERE/backend-link.txt"
   echo
   echo "  Or enter these manually in the StegApp top bar:"
   echo "    Backend URL :  $PUBLIC_URL"
