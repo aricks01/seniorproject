@@ -11,11 +11,15 @@ import subprocess
 from dataclasses import dataclass
 from pathlib import Path
 
-from config import STEGHIDE_BIN, STEGSEEK_BIN
+from config import STEGHIDE_BIN, STEGSEEK_BIN, DETECT_TIMEOUT
 
 
 class StegoError(Exception):
     """A steganography tool exited non-zero or behaved unexpectedly."""
+
+
+class StegoTimeout(StegoError):
+    """A tool ran longer than its allotted timeout and was killed."""
 
 
 @dataclass
@@ -46,7 +50,7 @@ def _run(cmd: list[str], proc_sink: dict | None = None,
     except subprocess.TimeoutExpired:
         proc.kill()
         out, err = proc.communicate()
-        raise StegoError("tool timed out")
+        raise StegoTimeout("tool timed out")
     return subprocess.CompletedProcess(cmd, proc.returncode, out, err)
 
 
@@ -95,7 +99,13 @@ def detect(stego: Path, proc_sink: dict | None = None) -> bool:
     it embeds. A clean carrier has no such seed, so a found seed is a strong
     signal that *something* was embedded (without recovering the passphrase).
     """
-    cp = _run([STEGSEEK_BIN, "--seed", str(stego)], proc_sink=proc_sink)
+    try:
+        cp = _run([STEGSEEK_BIN, "--seed", str(stego)],
+                  proc_sink=proc_sink, timeout=DETECT_TIMEOUT)
+    except StegoTimeout:
+        # A real steghide seed is cracked almost instantly; exhausting the
+        # timeout means the scan found nothing, so report "no data".
+        return False
     blob = (cp.stdout + cp.stderr).lower()
     if cp.returncode == 0 and ("found" in blob and "seed" in blob):
         return True

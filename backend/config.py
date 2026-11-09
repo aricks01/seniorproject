@@ -25,6 +25,12 @@ if _kali_wl.is_dir():
 if os.environ.get("STEGAPP_WORDLIST_DIR"):
     WORDLIST_DIRS.insert(0, Path(os.environ["STEGAPP_WORDLIST_DIR"]))
 
+# ---- Detect timeout --------------------------------------------------------
+# `stegseek --seed` finds a real steghide seed almost instantly; on a clean
+# file it would otherwise scan a huge space and appear to hang. Cap it (seconds)
+# and treat exceeding the cap as "no embedded data found".
+DETECT_TIMEOUT = int(os.environ.get("STEGAPP_DETECT_TIMEOUT", "90"))
+
 # ---- CORS ------------------------------------------------------------------
 # When the frontend is served from a different origin (e.g. a Render-hosted
 # copy) and this backend runs on Kali, the browser blocks the cross-origin API
