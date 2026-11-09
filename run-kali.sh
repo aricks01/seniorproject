@@ -31,6 +31,12 @@ export STEGAPP_API_KEY="$API_KEY"
 # STEGAPP_CORS_ORIGINS=https://your-app.onrender.com before running.
 export STEGAPP_CORS_ORIGINS="${STEGAPP_CORS_ORIGINS:-*}"
 
+# The Render-hosted frontend. Used to build a one-click "configure" link that
+# fills in the backend URL + API key with no typing. Override if your URL
+# differs:  STEGAPP_FRONTEND_URL=https://your-app.onrender.com ./run-kali.sh
+FRONTEND_URL="${STEGAPP_FRONTEND_URL:-https://seniorproject-pr8l.onrender.com}"
+FRONTEND_URL="${FRONTEND_URL%/}"
+
 # --- Ensure cloudflared is present (install the .deb if not). ----------------
 if ! command -v cloudflared >/dev/null 2>&1; then
   echo "cloudflared not found. Installing it (needs sudo)..."
@@ -74,8 +80,12 @@ trap cleanup EXIT
 banner() {
   echo
   echo "=================================================================="
-  echo "  Backend is live. In the Render-hosted StegApp page, enter:"
+  echo "  Backend is live. Open this link to auto-configure the frontend"
+  echo "  (no typing needed):"
   echo
+  echo "    ${FRONTEND_URL}/#backend=${PUBLIC_URL}&key=${API_KEY}"
+  echo
+  echo "  Or enter these manually in the StegApp top bar:"
   echo "    Backend URL :  $PUBLIC_URL"
   echo "    API key     :  $API_KEY"
   echo

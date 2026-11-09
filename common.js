@@ -174,7 +174,23 @@ async function pollJob(id, form, out, bar) {
   }
 }
 
+// ---- One-click config from the URL fragment ----
+// Opening the page with  #backend=<url>&key=<key>  stores those values (so the
+// Kali launcher can print a link that configures the frontend with no typing),
+// then strips the fragment so the key isn't left in the address bar / history.
+function applyLinkConfig() {
+  const hash = location.hash.startsWith("#") ? location.hash.slice(1) : "";
+  if (!hash) return;
+  const p = new URLSearchParams(hash);
+  const backend = p.get("backend");
+  const key = p.get("key");
+  if (backend) localStorage.setItem(API_BASE, backend.trim().replace(/\/+$/, ""));
+  if (key) localStorage.setItem(API_KEY, key);
+  if (backend || key) history.replaceState(null, "", location.pathname + location.search);
+}
+
 document.addEventListener("DOMContentLoaded", () => {
+  applyLinkConfig();
   wireApiKey();
   wireApiBase();
   wireNav();
