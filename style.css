@@ -139,10 +139,12 @@ nav.ops a.active {
 
 /* ---- Layout ---- */
 main {
-  max-width: 46rem;
+  max-width: 72rem;
   margin: 0 auto;
-  padding: 2rem 1.25rem 4rem;
+  padding: 2rem 1.5rem 4rem;
 }
+/* Keep single-column forms readable even on the wide page. */
+.panel { max-width: 44rem; margin-inline: auto; }
 
 /* ---- Hero (home) ---- */
 .hero::before {
@@ -166,7 +168,7 @@ main {
 /* ---- Operation grid / cards ---- */
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+  grid-template-columns: repeat(4, 1fr);
   gap: 1rem;
   margin-top: 1.75rem;
 }
@@ -381,7 +383,7 @@ input[type=file]::file-selector-button:hover {
 
 .use-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+  grid-template-columns: repeat(4, 1fr);
   gap: 1rem;
   margin-top: 1rem;
 }
@@ -407,9 +409,12 @@ input[type=file]::file-selector-button:hover {
 .steps li { margin: .5rem 0; }
 .steps b { color: var(--ink); }
 
+@media (max-width: 860px) {
+  .grid, .use-grid { grid-template-columns: repeat(2, 1fr); }
+}
 @media (max-width: 520px) {
   .topbar { padding: .7rem 1rem; }
-  .topbar .apibase, .topbar .apikey { margin-left: 0; }
   main { padding: 1.5rem 1rem 3rem; }
   .hero h1 { font-size: 1.8rem; }
+  .grid, .use-grid { grid-template-columns: 1fr; }
 }
