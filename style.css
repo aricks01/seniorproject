@@ -319,6 +319,20 @@ input[type=file]::file-selector-button:hover {
 .out.err  { border-left-color: var(--err); color: var(--err); }
 .out.busy { border-left-color: var(--accent); color: var(--accent-soft); }
 .out a { color: var(--accent-soft); }
+/* Crack download link: its own line under the passphrase. */
+.out a.dl-link {
+  display: inline-block;
+  margin-top: .6rem;
+  padding: .4rem .8rem;
+  border: 1px solid var(--accent);
+  border-radius: var(--radius);
+  color: var(--accent-soft);
+  text-decoration: none;
+  font-size: .82rem;
+  letter-spacing: .04em;
+  transition: background .15s, color .15s;
+}
+.out a.dl-link:hover { background: var(--accent); color: #fff; }
 
 /* ---- Progress bar ---- */
 .bar {

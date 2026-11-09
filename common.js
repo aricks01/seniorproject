@@ -182,11 +182,12 @@ async function pollJob(id, form, out, bar) {
       if (j.state === "failed")    { setOut(out, "Job failed.", "err"); return; }
       if (j.result === "found") {
         if (j.passphrase) {
-          setOut(out, `Passphrase found: ${j.passphrase}  `, "ok");
+          setOut(out, `Passphrase found: ${j.passphrase}`, "ok");
           if (j.download) {
             out.appendChild(Object.assign(document.createElement("a"),
               { href: j.download.startsWith("/") ? apiUrl(j.download) : j.download,
-                textContent: "Download extracted file" }));
+                textContent: "↓ Download extracted file",
+                className: "dl-link" }));
           }
         } else {
           setOut(out, "Hidden data likely present.", "ok");
