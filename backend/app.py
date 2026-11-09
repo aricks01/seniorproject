@@ -142,7 +142,10 @@ def detect(stego_file: UploadFile = File(..., alias="stego")) -> dict:
     stego_p = _save_upload(stego_file, work)
 
     def work_fn(job: Job) -> dict:
-        present = stego.detect(stego_p, proc_sink=job._proc_sink)
+        def on_progress(pct: float) -> None:
+            job.progress = pct
+        present = stego.detect(stego_p, proc_sink=job._proc_sink,
+                               on_progress=on_progress)
         shutil.rmtree(work, ignore_errors=True)
         return {"result": "found" if present else "not_found"}
 

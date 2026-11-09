@@ -20,12 +20,15 @@ class Job:
     state: str = "queued"          # queued -> running -> done/failed/cancelled
     result: dict[str, Any] = field(default_factory=dict)
     detail: str | None = None      # error message when failed
+    progress: float | None = None  # live percent while running (0-100)
     _proc_sink: dict = field(default_factory=dict)   # holds live Popen
     _cancelled: bool = False
 
     def view(self) -> dict:
         """Serialize to the JSON shape common.js expects when polling."""
         out: dict[str, Any] = {"job_id": self.id, "state": self.state}
+        if self.progress is not None and "percent" not in self.result:
+            out["percent"] = round(self.progress)
         out.update(self.result)
         if self.detail:
             out["detail"] = self.detail

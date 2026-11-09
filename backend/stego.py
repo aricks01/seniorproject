@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import re
 import subprocess
+import threading
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -54,6 +55,61 @@ def _run(cmd: list[str], proc_sink: dict | None = None,
     return subprocess.CompletedProcess(cmd, proc.returncode, out, err)
 
 
+_PROGRESS_RE = re.compile(r"Progress:\s*([\d.]+)%")
+
+
+def _run_streaming(cmd: list[str], proc_sink: dict | None = None,
+                   timeout: int | None = None,
+                   on_progress=None) -> subprocess.CompletedProcess:
+    """Like _run, but read output line-by-line so a progress callback fires live.
+
+    stegseek prints `Progress: NN.NN%` lines as it scans; `on_progress(float)`
+    is called for each. stderr is merged into stdout. A watchdog timer kills the
+    process after `timeout` seconds (raising StegoTimeout); cancel via proc_sink
+    still works by terminating the stored process.
+    """
+    try:
+        proc = subprocess.Popen(
+            cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True
+        )
+    except FileNotFoundError as e:
+        raise StegoError(f"tool not found: {cmd[0]} ({e})") from e
+    if proc_sink is not None:
+        proc_sink["proc"] = proc
+
+    timed_out = {"v": False}
+    timer = None
+    if timeout:
+        def _kill() -> None:
+            timed_out["v"] = True
+            proc.kill()
+        timer = threading.Timer(timeout, _kill)
+        timer.start()
+
+    captured: list[str] = []
+    try:
+        # Universal-newline mode turns stegseek's '\r' progress updates into
+        # separate lines, so iterating yields each progress tick.
+        for line in proc.stdout:  # type: ignore[union-attr]
+            captured.append(line)
+            if on_progress:
+                m = _PROGRESS_RE.search(line)
+                if m:
+                    try:
+                        on_progress(float(m.group(1)))
+                    except ValueError:
+                        pass
+        proc.stdout.close()  # type: ignore[union-attr]
+        rc = proc.wait()
+    finally:
+        if timer:
+            timer.cancel()
+
+    if timed_out["v"]:
+        raise StegoTimeout("tool timed out")
+    return subprocess.CompletedProcess(cmd, rc, "".join(captured), "")
+
+
 # --------------------------------------------------------------------- embed --
 def embed(cover: Path, secret: Path, out: Path, passphrase: str) -> None:
     """Hide `secret` inside `cover`, writing the stego file to `out`.
@@ -92,7 +148,7 @@ def extract(stego: Path, out: Path, passphrase: str) -> None:
 
 
 # -------------------------------------------------------------------- detect --
-def detect(stego: Path, proc_sink: dict | None = None) -> bool:
+def detect(stego: Path, proc_sink: dict | None = None, on_progress=None) -> bool:
     """Heuristically decide whether `stego` carries steghide-embedded data.
 
     Uses `stegseek --seed`, which cracks the per-file seed steghide derives when
@@ -100,8 +156,9 @@ def detect(stego: Path, proc_sink: dict | None = None) -> bool:
     signal that *something* was embedded (without recovering the passphrase).
     """
     try:
-        cp = _run([STEGSEEK_BIN, "--seed", str(stego)],
-                  proc_sink=proc_sink, timeout=DETECT_TIMEOUT)
+        cp = _run_streaming([STEGSEEK_BIN, "--seed", str(stego)],
+                            proc_sink=proc_sink, timeout=DETECT_TIMEOUT,
+                            on_progress=on_progress)
     except StegoTimeout:
         # Scan didn't finish within DETECT_TIMEOUT. Report "no data" rather than
         # hang; on a slow host this can be a false negative, so the timeout is
