@@ -29,31 +29,49 @@ const keyHdr = () => {
 // Empty = same origin (whatever host served this page). Set this to your Kali
 // backend's public URL (e.g. https://kali.example.com) when the frontend is
 // hosted somewhere else, like Render. Stored per-browser in localStorage and
-// editable from the "Backend URL" field injected into the topbar below.
+// editable from the "Backend URL" field on the Information page.
 const API_BASE = "stegapp_api_base";
 const apiBase = () => (localStorage.getItem(API_BASE) || "").trim().replace(/\/+$/, "");
 const apiUrl = path => apiBase() + path;            // path begins with "/"
 
+// Wire the #apibase field, if the current page has one (the Information page).
 function wireApiBase() {
-  const topbar = document.querySelector("header.topbar");
-  if (!topbar) return;
-  let field = document.getElementById("apibase");
-  if (!field) {
-    const label = document.createElement("label");
-    label.className = "apibase";
-    label.append("Backend URL");
-    field = Object.assign(document.createElement("input"), {
-      type: "url", id: "apibase", autocomplete: "off",
-      placeholder: "https://your-kali-host",
-    });
-    label.appendChild(field);
-    topbar.insertBefore(label, topbar.querySelector(".apikey"));
-  }
+  const field = document.getElementById("apibase");
+  if (!field) return;
   field.value = localStorage.getItem(API_BASE) || "";
   field.addEventListener("input", () => {
     localStorage.setItem(API_BASE, field.value.trim());
-    loadWordlists();   // re-fetch wordlists from the newly selected backend
+    loadWordlists();     // re-fetch wordlists from the newly selected backend
+    checkConnection();   // refresh the status indicator
   });
+}
+
+// ---- Connection status (Information page) ----
+// Pings the backend's /api/health and reflects the result in #constatus.
+async function checkConnection() {
+  const el = document.getElementById("constatus");
+  if (!el) return;
+  const base = apiBase();
+  el.className = "status checking";
+  el.textContent = base ? `Checking ${base} …` : "Checking this server …";
+  try {
+    const r = await fetch(apiUrl("/api/health"), { headers: keyHdr() });
+    if (!r.ok) throw new Error("HTTP " + r.status);
+    const j = await r.json();
+    const tools = j.tools || {};
+    const missing = ["steghide", "stegseek"].filter(t => !tools[t]);
+    if (missing.length) {
+      el.className = "status warn";
+      el.textContent = `Connected, but missing: ${missing.join(", ")}`;
+    } else {
+      el.className = "status ok";
+      el.textContent = base ? `Connected to ${base}` : "Connected (this server)";
+    }
+  } catch (err) {
+    el.className = "status err";
+    el.textContent = "Not connected — check the Backend URL" +
+      (err.message ? ` (${err.message})` : "");
+  }
 }
 
 // ---- Nav highlight ----
@@ -205,4 +223,5 @@ document.addEventListener("DOMContentLoaded", () => {
   wireNav();
   loadWordlists();
   wireForms();
+  checkConnection();
 });

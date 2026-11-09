@@ -11,10 +11,8 @@
     <a href="extract.html">Extract</a>
     <a href="detect.html">Detect</a>
     <a href="crack.html">Crack</a>
+    <a href="info.html">Information</a>
   </nav>
-  <label class="apikey">API key
-    <input type="password" id="apikey" autocomplete="off" placeholder="X-API-Key">
-  </label>
 </header>
 <main>
   <section class="hero">
@@ -24,22 +22,74 @@
   </section>
   <div class="grid">
     <a class="card" href="embed.html">
-      <h3><span class="ico">📥</span>Embed</h3>
+      <h3>Embed</h3>
       <p>Hide a secret file inside a cover image (JPEG/BMP) or audio carrier, optionally with a passphrase.</p>
     </a>
     <a class="card" href="extract.html">
-      <h3><span class="ico">📤</span>Extract</h3>
+      <h3>Extract</h3>
       <p>Pull a hidden payload back out of a stego file using the passphrase it was embedded with.</p>
     </a>
     <a class="card" href="detect.html">
-      <h3><span class="ico">🔎</span>Detect</h3>
+      <h3>Detect</h3>
       <p>Scan a file for signs of embedded content without trying to recover it.</p>
     </a>
     <a class="card" href="crack.html">
-      <h3><span class="ico">🔑</span>Crack</h3>
+      <h3>Crack</h3>
       <p>Run a wordlist against a stego file to recover an unknown passphrase.</p>
     </a>
   </div>
+
+  <section class="info-block">
+    <h2>What is steganography?</h2>
+    <p>Steganography is the practice of hiding information <em>inside</em> something
+       ordinary — an image, an audio clip, a document — so that its very existence
+       goes unnoticed. Where encryption makes a message unreadable, steganography
+       makes it <b>invisible</b>: to anyone looking, the carrier file is just a
+       normal photo or sound. The two are often combined, so a hidden payload is
+       both concealed and, if found, still encrypted.</p>
+    <p>StegApp works on the <span class="mono">steghide</span> model: a secret file
+       is woven into the least significant details of a carrier (a JPEG, BMP, WAV,
+       or AU file) using a passphrase. The result looks and plays back identically
+       to the original, but the passphrase can later pull the payload back out.</p>
+  </section>
+
+  <section class="info-block">
+    <h2>Where it's used</h2>
+    <div class="use-grid">
+      <div class="use">
+        <h4>Security research &amp; CTFs</h4>
+        <p>Capture-the-flag challenges routinely hide keys inside media files;
+           detecting and cracking them is a core skill.</p>
+      </div>
+      <div class="use">
+        <h4>Digital watermarking</h4>
+        <p>Studios and photographers embed invisible ownership marks to trace
+           leaks and prove provenance.</p>
+      </div>
+      <div class="use">
+        <h4>Private communication</h4>
+        <p>Journalists and activists under surveillance can pass messages that
+           don't even look like messages.</p>
+      </div>
+      <div class="use">
+        <h4>Malware analysis</h4>
+        <p>Attackers smuggle payloads and commands inside images; defenders learn
+           to spot the same techniques.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="info-block">
+    <h2>A quick workflow</h2>
+    <ol class="steps">
+      <li><b>Embed</b> a secret into a carrier with a passphrase.</li>
+      <li><b>Extract</b> it back out when you know the passphrase.</li>
+      <li><b>Detect</b> whether an unknown file is hiding anything at all.</li>
+      <li><b>Crack</b> a suspected carrier against a wordlist to recover the passphrase.</li>
+    </ol>
+    <p class="note">New here? Open the <a href="info.html">Information</a> page first to
+       connect to a backend, then head to <a href="embed.html">Embed</a>.</p>
+  </section>
 </main>
 <script src="common.js"></script>
 </body></html>

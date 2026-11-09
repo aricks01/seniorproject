@@ -336,6 +336,77 @@ input[type=file]::file-selector-button:hover {
   transition: width .3s ease;
 }
 
+/* ---- Connection status (Information page) ---- */
+.status {
+  font-family: var(--font-mono);
+  font-size: .85rem;
+  padding: .7rem 1rem;
+  margin: 0 0 1.3rem;
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--line-bright);
+  border-radius: var(--radius);
+  background: var(--bg-inset);
+  color: var(--muted);
+}
+.status::before { content: "● "; }
+.status.ok   { border-left-color: var(--ok);  color: var(--ok); }
+.status.warn { border-left-color: var(--accent-soft); color: var(--accent-soft); }
+.status.err  { border-left-color: var(--err); color: var(--err); }
+.status.checking { border-left-color: var(--accent); color: var(--accent-soft); }
+
+.note {
+  margin: 1.2rem 0 0;
+  font-size: .86rem;
+  color: var(--muted);
+}
+.note a { color: var(--accent-soft); }
+
+.facts { margin: .4rem 0 0; padding-left: 1.1rem; color: var(--muted); font-size: .92rem; }
+.facts li { margin: .5rem 0; }
+.facts b { color: var(--ink); font-family: var(--font-mono); }
+
+/* ---- Homepage info sections ---- */
+.info-block { margin-top: 2.5rem; }
+.info-block > h2 {
+  font-size: 1.3rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  margin: 0 0 .7rem;
+  padding-left: .7rem;
+  border-left: 3px solid var(--accent);
+}
+.info-block p { color: var(--muted); max-width: 42rem; }
+.info-block p b { color: var(--ink); }
+.info-block .mono { font-family: var(--font-mono); color: var(--accent-soft); font-size: .92em; }
+
+.use-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+.use {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-top: 2px solid var(--accent);
+  padding: 1rem 1.1rem 1.1rem;
+}
+.use h4 {
+  margin: 0 0 .35rem;
+  font-size: .98rem;
+  font-weight: 600;
+}
+.use p { margin: 0; color: var(--muted); font-size: .88rem; }
+
+.steps {
+  margin: .4rem 0 0;
+  padding-left: 1.3rem;
+  color: var(--muted);
+  font-size: .95rem;
+}
+.steps li { margin: .5rem 0; }
+.steps b { color: var(--ink); }
+
 @media (max-width: 520px) {
   .topbar { padding: .7rem 1rem; }
   .topbar .apibase, .topbar .apikey { margin-left: 0; }

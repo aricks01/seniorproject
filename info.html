@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Information — StegApp</title>
+<link rel="stylesheet" href="style.css">
+</head><body>
+<header class="topbar">
+  <a class="brand" href="index.html">Steg<span>App</span></a>
+  <nav class="ops">
+    <a href="embed.html">Embed</a>
+    <a href="extract.html">Extract</a>
+    <a href="detect.html">Detect</a>
+    <a href="crack.html">Crack</a>
+    <a href="info.html">Information</a>
+  </nav>
+</header>
+<main>
+<section class="panel">
+  <h2>Connection</h2>
+  <p class="lede">Point the app at the backend that runs the steganography tools,
+     and set the API key used for passphrase cracking. These are saved in this
+     browser and used across every page.</p>
+
+  <p id="constatus" class="status">Checking connection…</p>
+
+  <label>Backend URL
+    <span class="hint">Public address of the backend (e.g. your Kali host's
+      tunnel URL). Leave blank to use this same server.</span>
+    <input type="url" id="apibase" autocomplete="off" placeholder="https://your-kali-host">
+  </label>
+
+  <label>API key
+    <span class="hint">Required by the Crack operation. Must match the key the
+      backend was started with.</span>
+    <input type="password" id="apikey" autocomplete="off" placeholder="X-API-Key">
+  </label>
+
+  <p class="note">Tip: the backend launcher prints a one-click link that fills in
+     both of these automatically — opening it is the same as typing them here.</p>
+</section>
+
+<section class="panel">
+  <h2>How it works</h2>
+  <p class="lede">StegApp is a browser front end. The pages you see are served
+     from one host, while the actual steganography runs on a backend that has the
+     command-line tools installed.</p>
+  <ul class="facts">
+    <li><b>steghide</b> — embeds and extracts hidden payloads, and is what the
+      Embed and Extract pages drive.</li>
+    <li><b>stegseek</b> — a fast cracker used by the Detect and Crack pages to
+      test for hidden data and recover passphrases from a wordlist.</li>
+    <li>Uploads and results are processed on the backend and are not stored
+      permanently; restarting the backend clears them.</li>
+  </ul>
+</section>
+</main>
+<script src="common.js"></script>
+</body></html>
