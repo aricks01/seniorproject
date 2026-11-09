@@ -103,8 +103,9 @@ def detect(stego: Path, proc_sink: dict | None = None) -> bool:
         cp = _run([STEGSEEK_BIN, "--seed", str(stego)],
                   proc_sink=proc_sink, timeout=DETECT_TIMEOUT)
     except StegoTimeout:
-        # A real steghide seed is cracked almost instantly; exhausting the
-        # timeout means the scan found nothing, so report "no data".
+        # Scan didn't finish within DETECT_TIMEOUT. Report "no data" rather than
+        # hang; on a slow host this can be a false negative, so the timeout is
+        # set generously and is tunable via STEGAPP_DETECT_TIMEOUT.
         return False
     blob = (cp.stdout + cp.stderr).lower()
     if cp.returncode == 0 and ("found" in blob and "seed" in blob):

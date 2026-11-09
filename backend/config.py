@@ -26,10 +26,13 @@ if os.environ.get("STEGAPP_WORDLIST_DIR"):
     WORDLIST_DIRS.insert(0, Path(os.environ["STEGAPP_WORDLIST_DIR"]))
 
 # ---- Detect timeout --------------------------------------------------------
-# `stegseek --seed` finds a real steghide seed almost instantly; on a clean
-# file it would otherwise scan a huge space and appear to hang. Cap it (seconds)
-# and treat exceeding the cap as "no embedded data found".
-DETECT_TIMEOUT = int(os.environ.get("STEGAPP_DETECT_TIMEOUT", "90"))
+# `stegseek --seed` brute-forces the full 32-bit seed space (~4.3 billion), so
+# it can take a while even when data IS present (the seed may sit anywhere in
+# that range) — and on a clean file it scans the whole space. Cap it (seconds)
+# only to stop a truly stuck run from hanging forever; set it generously so a
+# real embed isn't cut off mid-scan. Raise it on a slow host (e.g. a VM):
+#   STEGAPP_DETECT_TIMEOUT=600 ./run-kali.sh
+DETECT_TIMEOUT = int(os.environ.get("STEGAPP_DETECT_TIMEOUT", "300"))
 
 # ---- CORS ------------------------------------------------------------------
 # When the frontend is served from a different origin (e.g. a Render-hosted
