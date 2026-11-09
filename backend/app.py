@@ -27,6 +27,7 @@ import tempfile
 from pathlib import Path
 
 from fastapi import FastAPI, Header, HTTPException, UploadFile, File, Form
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
@@ -35,6 +36,17 @@ import stego
 from jobs import Job, jobs
 
 app = FastAPI(title="StegApp API", version="1.0")
+
+# Allow a separately-hosted frontend (e.g. on Render) to call this backend.
+# Configured via STEGAPP_CORS_ORIGINS; defaults to "*". No cookies are used
+# (auth is the X-API-Key header), so credentials stay disabled.
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=config.CORS_ORIGINS,
+    allow_credentials=False,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 # --------------------------------------------------------------- utilities --

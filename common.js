@@ -25,6 +25,37 @@ const keyHdr = () => {
   return k ? { "X-API-Key": k } : {};
 };
 
+// ---- API base URL: which backend to call ----
+// Empty = same origin (whatever host served this page). Set this to your Kali
+// backend's public URL (e.g. https://kali.example.com) when the frontend is
+// hosted somewhere else, like Render. Stored per-browser in localStorage and
+// editable from the "Backend URL" field injected into the topbar below.
+const API_BASE = "stegapp_api_base";
+const apiBase = () => (localStorage.getItem(API_BASE) || "").trim().replace(/\/+$/, "");
+const apiUrl = path => apiBase() + path;            // path begins with "/"
+
+function wireApiBase() {
+  const topbar = document.querySelector("header.topbar");
+  if (!topbar) return;
+  let field = document.getElementById("apibase");
+  if (!field) {
+    const label = document.createElement("label");
+    label.className = "apibase";
+    label.append("Backend URL");
+    field = Object.assign(document.createElement("input"), {
+      type: "url", id: "apibase", autocomplete: "off",
+      placeholder: "https://your-kali-host",
+    });
+    label.appendChild(field);
+    topbar.insertBefore(label, topbar.querySelector(".apikey"));
+  }
+  field.value = localStorage.getItem(API_BASE) || "";
+  field.addEventListener("input", () => {
+    localStorage.setItem(API_BASE, field.value.trim());
+    loadWordlists();   // re-fetch wordlists from the newly selected backend
+  });
+}
+
 // ---- Nav highlight ----
 function wireNav() {
   const here = (location.pathname.split("/").pop() || "index.html");
@@ -56,7 +87,7 @@ async function loadWordlists() {
   const sel = document.querySelector("select[name=wordlist_name]");
   if (!sel) return;
   try {
-    const r = await fetch("/api/wordlists", { headers: keyHdr() });
+    const r = await fetch(apiUrl("/api/wordlists"), { headers: keyHdr() });
     if (!r.ok) throw new Error();
     const list = await r.json();
     sel.innerHTML = list.map(n => `<option>${esc(n)}</option>`).join("")
@@ -81,7 +112,7 @@ function wireForms() {
         const fd = new FormData(form);
         // drop empty optional file inputs so the server sees "no upload"
         for (const [k, v] of [...fd]) if (v instanceof File && !v.name) fd.delete(k);
-        const res = await fetch(form.dataset.endpoint,
+        const res = await fetch(apiUrl(form.dataset.endpoint),
           { method: "POST", body: fd, headers: keyHdr() });
         if (!res.ok) await fail(res);
         if (form.dataset.mode === "file") {
@@ -106,11 +137,11 @@ async function pollJob(id, form, out, bar) {
   if (cancel) {
     cancel.hidden = false;
     cancel.onclick = () =>
-      fetch(`/api/jobs/${id}/cancel`, { method: "POST", headers: keyHdr() });
+      fetch(apiUrl(`/api/jobs/${id}/cancel`), { method: "POST", headers: keyHdr() });
   }
   try {
     while (true) {
-      const res = await fetch(`/api/jobs/${id}`, { headers: keyHdr() });
+      const res = await fetch(apiUrl(`/api/jobs/${id}`), { headers: keyHdr() });
       if (!res.ok) await fail(res);
       const j = await res.json();
       if (j.state === "queued" || j.state === "running") {
@@ -127,7 +158,8 @@ async function pollJob(id, form, out, bar) {
           setOut(out, `Passphrase found: ${j.passphrase}  `, "ok");
           if (j.download) {
             out.appendChild(Object.assign(document.createElement("a"),
-              { href: j.download, textContent: "Download extracted file" }));
+              { href: j.download.startsWith("/") ? apiUrl(j.download) : j.download,
+                textContent: "Download extracted file" }));
           }
         } else {
           setOut(out, "Hidden data likely present.", "ok");
@@ -144,6 +176,7 @@ async function pollJob(id, form, out, bar) {
 
 document.addEventListener("DOMContentLoaded", () => {
   wireApiKey();
+  wireApiBase();
   wireNav();
   loadWordlists();
   wireForms();

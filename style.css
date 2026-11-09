@@ -77,6 +77,25 @@ nav.ops a.active { background: var(--accent); color: var(--accent-ink); }
   background: var(--bg);
   color: var(--ink);
 }
+/* Backend URL control (injected by common.js); mirrors .apikey styling. */
+.apibase {
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+  font-size: .85rem;
+  color: var(--muted);
+}
+.apibase input {
+  width: 13rem;
+  padding: .35rem .5rem;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--ink);
+}
+/* Group the Backend URL + API key controls together on the right. */
+.topbar .apibase { margin-left: auto; }
+.topbar .apikey { margin-left: 0; }
 main {
   max-width: 44rem;
   margin: 0 auto;

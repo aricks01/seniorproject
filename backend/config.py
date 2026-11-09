@@ -25,6 +25,22 @@ if _kali_wl.is_dir():
 if os.environ.get("STEGAPP_WORDLIST_DIR"):
     WORDLIST_DIRS.insert(0, Path(os.environ["STEGAPP_WORDLIST_DIR"]))
 
+# ---- CORS ------------------------------------------------------------------
+# When the frontend is served from a different origin (e.g. a Render-hosted
+# copy) and this backend runs on Kali, the browser blocks the cross-origin API
+# calls unless the backend sends CORS headers allowing that origin.
+#
+# STEGAPP_CORS_ORIGINS is a comma-separated list of allowed origins, e.g.
+#   STEGAPP_CORS_ORIGINS=https://my-stegapp.onrender.com
+# Default "*" allows any origin. That's acceptable here because auth is an
+# explicit X-API-Key header (not cookies), but set it to your frontend's URL
+# to be strict. Use the scheme + host + port only, with no trailing slash.
+CORS_ORIGINS = [
+    o.strip()
+    for o in os.environ.get("STEGAPP_CORS_ORIGINS", "*").split(",")
+    if o.strip()
+]
+
 # ---- API key ---------------------------------------------------------------
 # If set, the X-API-Key header on /api/crack must match exactly. If left unset,
 # any non-empty key is accepted (dev mode) — matching the frontend's behavior.
