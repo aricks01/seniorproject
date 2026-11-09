@@ -70,6 +70,15 @@ function setOut(out, msg, cls) {
   out.textContent = msg;
 }
 
+// Pull the server's suggested filename out of the Content-Disposition header
+// (needs CORS expose_headers=Content-Disposition cross-origin). Returns "" if
+// unavailable, so callers fall back to their own default name.
+function filenameFrom(res) {
+  const cd = res.headers.get("Content-Disposition") || "";
+  const m = cd.match(/filename\*?=(?:UTF-8'')?"?([^";]+)"?/i);
+  return m ? decodeURIComponent(m[1].trim()) : "";
+}
+
 function saveBlob(blob, name) {
   const a = Object.assign(document.createElement("a"),
     { href: URL.createObjectURL(blob), download: name });
@@ -116,7 +125,7 @@ function wireForms() {
           { method: "POST", body: fd, headers: keyHdr() });
         if (!res.ok) await fail(res);
         if (form.dataset.mode === "file") {
-          saveBlob(await res.blob(), form.dataset.name || "output.bin");
+          saveBlob(await res.blob(), filenameFrom(res) || form.dataset.name || "output.bin");
           setOut(out, "Done — file downloaded.", "ok");
         } else {
           const { job_id } = await res.json();

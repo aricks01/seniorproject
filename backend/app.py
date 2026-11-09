@@ -46,6 +46,8 @@ app.add_middleware(
     allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
+    # Let the cross-origin frontend read the suggested download filename.
+    expose_headers=["Content-Disposition"],
 )
 
 
